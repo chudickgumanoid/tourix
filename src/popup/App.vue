@@ -107,25 +107,24 @@ onMounted(checkStatus)
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-* {
-  box-sizing: border-box;
+html, body {
+  width: 320px;
   margin: 0;
   padding: 0;
+  background-color: #f8fafc;
+  overflow-x: hidden;
 }
 
-body {
-  width: 320px;
-  font-family: 'Inter', sans-serif;
-  background-color: #f8fafc;
-  color: #1e293b;
-  overflow: hidden;
+* {
+  box-sizing: border-box;
 }
 
 .popup-wrapper {
-  width: 100%;
-  min-height: 380px;
+  width: 320px;
+  min-height: 350px;
   display: flex;
   flex-direction: column;
+  background-color: #f8fafc;
 }
 
 .header {

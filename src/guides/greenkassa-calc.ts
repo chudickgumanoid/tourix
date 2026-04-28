@@ -9,35 +9,42 @@ export const greenkassaCalcGuide: Guide = {
       id: 'calc-intro',
       selector: '',
       title: 'Функции управления ⚙️',
-      description: 'В этом меню вы можете управлять состоянием кассы, менять режимы работы и закрывать смену.',
+      description: 'Сейчас мы изучим меню управления кассой. Нажмите "Далее", а затем кликните на иконку калькулятора.',
       isIntro: true
     },
     {
+      id: 'open-menu',
+      selector: '.cashier-header__right .img-green-hover',
+      title: 'Откройте меню',
+      description: 'Нажмите на эту иконку, чтобы развернуть панель управления сменной и кассой.',
+      placement: 'bottom'
+    },
+    {
       id: 'shift-info',
-      selector: '.control__info',
+      selector: '.dropdown-menu .control__info',
       title: 'Статус смены',
-      description: 'Здесь видна информация о текущем кассире, режиме (Продажа/Покупка) и времени открытия смены.',
+      description: 'Здесь видна информация о текущем кассире, режиме работы и времени открытия смены.',
       placement: 'left'
     },
     {
       id: 'cash-amount',
-      selector: '.blue-text-medium',
+      selector: '.dropdown-menu .blue-text-medium',
       title: 'Наличные в кассе',
-      description: 'Текущая сумма наличных денег. Проверяйте её перед изъятием или внесением.',
+      description: 'Текущая сумма наличных. Проверяйте её перед выполнением операций внесения или изъятия.',
       placement: 'left'
     },
     {
       id: 'op-btns',
-      selector: '.control__btns',
-      title: 'Операции',
-      description: 'Кнопки для быстрой смены режима: Продажа, Возврат или X-отчет.',
+      selector: '.dropdown-menu .control__btns',
+      title: 'Быстрые операции',
+      description: 'Используйте эти кнопки для переключения режимов (Продажа/Возврат) или печати X-отчета.',
       placement: 'left'
     },
     {
       id: 'close-shift',
-      selector: '.button-general.orange-fill.mini',
+      selector: '.dropdown-menu .button-general.orange-fill',
       title: 'Закрыть смену',
-      description: 'Нажмите здесь в конце рабочего дня, чтобы сформировать Z-отчет и закрыть смену.',
+      description: 'В конце рабочего дня нажмите эту кнопку для закрытия смены и печати Z-отчета.',
       placement: 'top'
     }
   ]

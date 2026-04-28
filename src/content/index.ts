@@ -28,9 +28,10 @@ function detectVue(): boolean {
 function updateBadge() {
   console.log('Tourix: Checking for guides...', window.location.href);
   const isVue = detectVue();
-  const hasGuide = !!GuideRegistry.findGuideForUrl(window.location.href);
+  const guides = GuideRegistry.findGuidesForUrl(window.location.href);
+  const hasGuide = guides.length > 0;
   
-  console.log('Tourix: Vue detected:', isVue, 'Guide found:', hasGuide);
+  console.log('Tourix: Vue detected:', isVue, 'Guides found:', guides.length);
 
   if (hasGuide) {
     chrome.runtime.sendMessage({
