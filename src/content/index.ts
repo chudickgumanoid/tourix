@@ -1,11 +1,16 @@
 import { GuideRunner } from '../core/GuideRunner';
 import { GuideRegistry } from '../core/GuideRegistry';
 import { MessageBridge } from '../core/MessageBridge';
-import { ExtensionMessage } from '../core/types';
+import { ExtensionMessage, GuideStep } from '../core/types';
+import { BuilderOverlay } from './BuilderOverlay';
+import { GuideConstructor } from '../core/GuideConstructor';
+import { StorageService } from '../core/StorageService';
 
 console.log('!!! TOURIX DEBUG: SCRIPT ATTEMPTING TO LOAD !!!');
 
 const runner = new GuideRunner();
+const guideConstructor = new GuideConstructor();
+let builderOverlay: BuilderOverlay | null = null;
 
 function detectVue(): boolean {
   const hasDevtoolsHook = !!(window as any).__VUE_DEVTOOLS_GLOBAL_HOOK__;
@@ -25,10 +30,10 @@ function detectVue(): boolean {
   return hasDevtoolsHook || hasAppRoot || hasVueInstance || hasVueAttr;
 }
 
-function updateBadge() {
+async function updateBadge() {
   console.log('Tourix: Checking for guides...', window.location.href);
   const isVue = detectVue();
-  const guides = GuideRegistry.findGuidesForUrl(window.location.href);
+  const guides = await GuideRegistry.findGuidesForUrl(window.location.href);
   const hasGuide = guides.length > 0;
   
   console.log('Tourix: Vue detected:', isVue, 'Guides found:', guides.length);
@@ -49,12 +54,12 @@ function updateBadge() {
 // Запускаем проверку при загрузке
 setTimeout(updateBadge, 1500); 
 
-MessageBridge.onMessage((message: ExtensionMessage, sender, sendResponse) => {
+MessageBridge.onMessage(async (message: ExtensionMessage, sender, sendResponse) => {
   console.log('Tourix: Received message:', message.type, message.payload);
   
   switch (message.type) {
     case 'START_GUIDE':
-      const guide = GuideRegistry.getGuideById(message.payload.guideId);
+      const guide = await GuideRegistry.getGuideById(message.payload.guideId);
       if (guide) {
         runner.start(guide).then(() => {
           sendResponse({ success: true });
@@ -64,7 +69,7 @@ MessageBridge.onMessage((message: ExtensionMessage, sender, sendResponse) => {
       break;
 
     case 'CONTINUE_GUIDE':
-      const contGuide = GuideRegistry.getGuideById(message.payload.guideId);
+      const contGuide = await GuideRegistry.getGuideById(message.payload.guideId);
       if (contGuide) {
         runner.start(contGuide, message.payload.stepIndex).then(() => {
           sendResponse({ success: true });
@@ -88,6 +93,41 @@ MessageBridge.onMessage((message: ExtensionMessage, sender, sendResponse) => {
     
     case 'CHECK_VUE':
       sendResponse({ vueDetected: detectVue() });
+      break;
+
+    case 'START_CONSTRUCTOR':
+      builderOverlay = new BuilderOverlay(
+        async (name: string, description: string, steps: GuideStep[]) => {
+          guideConstructor.updateSteps(steps);
+          const guide = guideConstructor.export(name, description);
+          await StorageService.saveCustomGuide(guide);
+          console.log('TOURIX SAVED:', guide);
+          alert('Гайд сохранен локально и появится в списке расширения!');
+        },
+        () => {
+          guideConstructor.stop();
+          builderOverlay?.remove();
+          builderOverlay = null;
+        },
+        () => {
+          guideConstructor.setPicking(true);
+        },
+        (updatedSteps: GuideStep[]) => {
+          // Важно! Синхронизируем состояние в ядре при любом изменении в UI
+          guideConstructor.updateSteps(updatedSteps);
+        }
+      );
+      guideConstructor.start((steps: GuideStep[]) => {
+        builderOverlay?.updateSteps(steps);
+      });
+      sendResponse({ success: true });
+      break;
+
+    case 'STOP_CONSTRUCTOR':
+      guideConstructor.stop();
+      builderOverlay?.remove();
+      builderOverlay = null;
+      sendResponse({ success: true });
       break;
   }
 });

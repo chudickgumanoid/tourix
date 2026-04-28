@@ -18,7 +18,7 @@ const checkStatus = async () => {
       return
     }
 
-    matchingGuides.value = GuideRegistry.findGuidesForUrl(tab.url)
+    matchingGuides.value = await GuideRegistry.findGuidesForUrl(tab.url)
     progress.value = await StorageService.getProgress()
 
     const status = await MessageBridge.sendMessageToTab(tab.id, { type: 'GET_STATUS' })
@@ -52,6 +52,14 @@ const stopGuide = async () => {
   }
 }
 
+const startConstructor = async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+  if (tab?.id) {
+    await MessageBridge.sendMessageToTab(tab.id, { type: 'START_CONSTRUCTOR' })
+    window.close()
+  }
+}
+
 onMounted(checkStatus)
 </script>
 
@@ -62,6 +70,9 @@ onMounted(checkStatus)
         <div class="logo-icon">T</div>
         <span>Tourix Onboarding</span>
       </div>
+      <button @click="startConstructor" class="btn-icon-action" title="Создать новый гайд">
+        +
+      </button>
     </header>
 
     <main class="content">
@@ -131,6 +142,28 @@ html, body {
   padding: 16px 20px;
   background: white;
   border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-icon-action {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 8px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-icon-action:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 .logo {

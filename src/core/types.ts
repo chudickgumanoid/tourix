@@ -12,6 +12,7 @@ export interface GuideStep {
 export interface Guide {
   id: string;
   name: string;
+  description?: string;
   matches: string[];
   steps: GuideStep[];
 }
@@ -27,7 +28,9 @@ export type MessageType =
   | 'CONTINUE_GUIDE' 
   | 'STOP_GUIDE' 
   | 'GET_STATUS' 
-  | 'CHECK_VUE';
+  | 'CHECK_VUE'
+  | 'START_CONSTRUCTOR'
+  | 'STOP_CONSTRUCTOR';
 
 export interface ExtensionMessage {
   type: MessageType;
