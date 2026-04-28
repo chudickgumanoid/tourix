@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Tourix Onboarding",
+  "version": "1.1.1",
+  "action": {
+    "default_popup": "src/popup/index.html"
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": ["src/content/index.ts"],
+      "matches": [
+        "https://cabinet.stage.greenkassa.kz/*",
+        "http://localhost/*",
+        "https://example.com/*"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://cabinet.stage.greenkassa.kz/*",
+    "http://localhost/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*", "*.js", "*.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
